@@ -15,16 +15,24 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    api(project(":api"))
+}
+
 allprojects {
+    apply {
+        apply<JavaPlugin>()
+        apply<JavaLibraryPlugin>()
+        apply<LombokPlugin>()
+    }
+
     repositories {
         mavenCentral()
         mavenLocal()
     }
 
-    apply {
-        apply<JavaPlugin>()
-        apply<JavaLibraryPlugin>()
-        apply<LombokPlugin>()
+    dependencies {
+        implementation("org.jetbrains:annotations:24.1.0")
     }
 
     tasks {
