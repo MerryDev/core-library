@@ -1,0 +1,6 @@
+triage:
+  - '/.*/'
+bug:
+  - '(issue|bug|urgent|critical|bug|problem)'
+enhancement:
+  - '(enhancement|improvement)'
