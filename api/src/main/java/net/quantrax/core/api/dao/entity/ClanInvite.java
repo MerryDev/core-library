@@ -1,6 +1,19 @@
 package net.quantrax.core.api.dao.entity;
 
-import net.quantrax.core.api.dao.base.Entity;
+import net.quantrax.core.api.dao.base.entity.IntEntity;
+import org.jetbrains.annotations.NotNull;
 
-public interface ClanInvite extends Entity<Integer> {
+import java.sql.Timestamp;
+import java.util.UUID;
+
+public interface ClanInvite extends IntEntity {
+
+    @NotNull UUID inviter();
+
+    @NotNull UUID requested();
+
+    @NotNull Timestamp created();
+
+    int clanId();
+
 }
