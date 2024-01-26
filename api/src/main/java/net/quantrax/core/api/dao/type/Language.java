@@ -1,4 +1,4 @@
-package net.quantrax.core.api;
+package net.quantrax.core.api.dao.type;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

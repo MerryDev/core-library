@@ -1,8 +1,8 @@
 package net.quantrax.core.api.dao.repository;
 
-import net.quantrax.core.api.Language;
 import net.quantrax.core.api.dao.base.Repository;
 import net.quantrax.core.api.dao.entity.QPlayer;
+import net.quantrax.core.api.dao.type.Language;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

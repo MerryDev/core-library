@@ -1,7 +1,7 @@
 package net.quantrax.core.api.dao.entity;
 
-import net.quantrax.core.api.Language;
 import net.quantrax.core.api.dao.base.Entity;
+import net.quantrax.core.api.dao.type.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;

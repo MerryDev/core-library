@@ -1,8 +1,8 @@
 package net.quantrax.core.dao.entity;
 
 import de.chojo.sadu.wrapper.util.UpdateResult;
-import net.quantrax.core.api.Language;
 import net.quantrax.core.api.dao.entity.*;
+import net.quantrax.core.api.dao.type.Language;
 import net.quantrax.core.api.util.Log;
 import net.quantrax.core.api.util.Preconditions;
 import org.jetbrains.annotations.Contract;
