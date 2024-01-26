@@ -1,4 +1,6 @@
 package net.quantrax.core.api.dao.entity;
 
-public interface ClanInvite {
+import net.quantrax.core.api.dao.base.Entity;
+
+public interface ClanInvite extends Entity<Integer> {
 }

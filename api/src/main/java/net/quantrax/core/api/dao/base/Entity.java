@@ -1,12 +1,9 @@
 package net.quantrax.core.api.dao.base;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
-@Getter
-@AllArgsConstructor
-public abstract class Entity<T> {
+public interface Entity<T> {
 
-    protected final T identifier;
+    @NotNull T identifier();
 
 }

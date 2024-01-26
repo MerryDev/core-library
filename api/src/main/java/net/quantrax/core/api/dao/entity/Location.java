@@ -1,4 +1,6 @@
 package net.quantrax.core.api.dao.entity;
 
-public interface Location {
+import net.quantrax.core.api.dao.base.Entity;
+
+public interface Location extends Entity<String> {
 }

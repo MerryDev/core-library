@@ -1,15 +1,28 @@
 package net.quantrax.core.api.dao.entity;
 
 import net.quantrax.core.api.Language;
+import net.quantrax.core.api.dao.base.Entity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.UUID;
 
-public interface QPlayer {
+public interface QPlayer extends Entity<UUID> {
 
-    Optional<Clan> clan();
+    @NotNull Timestamp firstOnline();
+
+    @NotNull Timestamp lastOnline();
+
+    @NotNull String name();
+
+    int coins();
+
+    @Nullable Clan clan();
+
+    @Nullable Long discordId();
 
     @NotNull @UnmodifiableView Collection<Friendship> friendships();
 
@@ -18,6 +31,8 @@ public interface QPlayer {
     @NotNull @UnmodifiableView Collection<ClanInvite> clanInvites();
 
     void friendRequest(@NotNull FriendRequest request);
+
+    void discordId(@NotNull Long discordId);
 
     void clanRequest(@NotNull ClanRequest request);
 
