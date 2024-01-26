@@ -1,12 +1,12 @@
 package net.quantrax.core.api.dao.entity;
 
-import net.quantrax.core.api.dao.base.Entity;
+import net.quantrax.core.api.dao.base.entity.IntEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
 import java.util.UUID;
 
-public interface FriendRequest extends Entity<Integer> {
+public interface FriendRequest extends IntEntity {
 
     @NotNull UUID inviter();
 
@@ -14,7 +14,7 @@ public interface FriendRequest extends Entity<Integer> {
 
     @NotNull Timestamp created();
 
-    void accept();
+    @NotNull Friendship accept();
 
     void deny();
 
