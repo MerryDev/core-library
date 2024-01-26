@@ -32,7 +32,9 @@ allprojects {
     }
 
     dependencies {
-        implementation("org.jetbrains:annotations:24.1.0")
+        api("org.jetbrains:annotations:24.1.0")
+        api("org.apache.commons:commons-lang3:3.14.0")
+        api("com.google.guava:guava:33.0.0-jre")
     }
 
     tasks {
