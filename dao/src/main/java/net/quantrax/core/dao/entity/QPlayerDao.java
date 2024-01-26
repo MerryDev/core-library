@@ -1,5 +1,7 @@
 package net.quantrax.core.dao.entity;
 
+import com.google.common.collect.Lists;
+import de.chojo.sadu.wrapper.util.Row;
 import de.chojo.sadu.wrapper.util.UpdateResult;
 import net.quantrax.core.api.dao.entity.*;
 import net.quantrax.core.api.dao.type.Language;
@@ -10,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collection;
@@ -46,6 +49,14 @@ public class QPlayerDao implements QPlayer {
         this.language = language;
         this.discordId = discordId;
         this.coins = coins;
+    }
+
+    // Begin public api
+
+    @Contract("_ -> new")
+    public static @NotNull QPlayer fromRow(@NotNull Row row) throws SQLException {
+        return new QPlayerDao(row.getUuidFromString("uuid"), row.getString("name"), Language.findByName(row.getString("language")), row.getLong("discord_account_id"),
+                row.getInt("coins"), row.getTimestamp("first_online"), row.getTimestamp("last_online"));
     }
 
     @Contract("_, _ -> new")
@@ -101,20 +112,19 @@ public class QPlayerDao implements QPlayer {
 
     @Override
     public @NotNull @UnmodifiableView Collection<ClanInvite> clanInvites() {
+        updateClanInvites();
         return Collections.unmodifiableCollection(clanInvites);
     }
 
     @Override
-    public void friendRequest(@NotNull FriendRequest request) {
+    public void clan(@NotNull Clan clan) {
+        Preconditions.state(this.clan == null, "The player currently is in a clan");
+        this.clan = clan;
     }
 
     @Override
     public void discordId(@NotNull Long discordId) {
         this.discordId = discordId;
-    }
-
-    @Override
-    public void clanRequest(@NotNull ClanRequest request) {
     }
 
     @Override
@@ -143,6 +153,30 @@ public class QPlayerDao implements QPlayer {
     }
 
     @Override
+    public void inviteFriend(@NotNull FriendRequest request) {
+        builder()
+                .query("INSERT INTO friendships.friend_request (inviter_uid, requested_uid) VALUE (?, ?);")
+                .parameter(stmt -> stmt.setUuidAsString(uuid).setUuidAsString(request.requested()))
+                .insert().send()
+                .exceptionally(throwable -> {
+                    Log.severe("Inviting the player with uuid %s as a friend by player with uuid %s failed with an exception: %s", request.requested(), uuid, throwable.getMessage());
+                    return new UpdateResult(0);
+                });
+    }
+
+    @Override
+    public void requestClan(@NotNull ClanRequest request) {
+        builder()
+                .query("INSERT INTO clan.clan_request (requester_uid, clan_id) VALUE (?, ?);")
+                .parameter(stmt -> stmt.setUuidAsString(uuid).setInt(request.clanId()))
+                .insert().send()
+                .exceptionally(throwable -> {
+                    Log.severe("Requesting clan with id %s to join by player with uuid %s failed with an exception: %s", request.clanId(), uuid, throwable.getMessage());
+                    return new UpdateResult(0);
+                });
+    }
+
+    @Override
     public void acceptAllFriendRequests() {
         builder(FriendRequest.class)
                 .query("SELECT * FROM friendships.friend_request WHERE requested_uid=?;")
@@ -153,11 +187,8 @@ public class QPlayerDao implements QPlayer {
                     Log.severe("Accepting all pending incoming friend requests of player with uuid %s failed with an exception: %s", uuid, throwable.getMessage());
                     return Collections.emptyList();
                 })
-                .thenApply(friendRequests -> this.friendRequests = Collections.unmodifiableCollection(friendRequests))
-                .thenAccept(friendRequests -> {
-                    friendRequests.forEach(FriendRequest::accept);
-                    denyAllFriendRequests();
-                });
+                .thenApply(this::applyFriendships)
+                .thenAccept(friendships -> this.friendships = Collections.unmodifiableCollection(friendships));
     }
 
     @Override
@@ -169,7 +200,8 @@ public class QPlayerDao implements QPlayer {
                 .exceptionally(throwable -> {
                     Log.severe("Deleting all incoming friend requests from player with uuid %s failed with an exception: %s", uuid, throwable.getMessage());
                     return new UpdateResult(0);
-                });
+                })
+                .thenAccept($ -> this.friendRequests = Collections.emptyList());
     }
 
     @Override
@@ -184,6 +216,8 @@ public class QPlayerDao implements QPlayer {
                 });
     }
 
+    // Begin internal API
+
     private void updateFriendships() {
         builder(Friendship.class)
                 .query("SELECT * FROM friendships.friendship WHERE first_uid=? OR second_uid=?;")
@@ -195,5 +229,25 @@ public class QPlayerDao implements QPlayer {
                     return Collections.emptyList();
                 })
                 .thenAccept(friendships -> this.friendships = Collections.unmodifiableCollection(friendships));
+    }
+
+    private void updateClanInvites() {
+        builder(ClanInvite.class)
+                .query("SELECT * FROM clan.clan_invite WHERE requested_uid=?;")
+                .parameter(stmt -> stmt.setUuidAsString(uuid))
+                .readRow(null)
+                .all()
+                .exceptionally(throwable -> {
+                    Log.severe("Fetching all open clan invites to player with uuid %s failed with an exception: %s", uuid, throwable.getMessage());
+                    return Collections.emptyList();
+                })
+                .thenAccept(invites -> this.clanInvites = Collections.unmodifiableCollection(invites));
+    }
+
+    private @NotNull Collection<Friendship> applyFriendships(@NotNull Collection<FriendRequest> friendRequests) {
+        final Collection<Friendship> friendships = Lists.newArrayList(this.friendships);
+        friendRequests.stream().map(FriendRequest::accept).forEach(friendships::add);
+
+        return friendships;
     }
 }
