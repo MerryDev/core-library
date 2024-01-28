@@ -15,13 +15,13 @@ public enum ClanRole {
     MODERATOR("Moderator", "core.api.clan-role.moderator", 3),
     MEMBER("Member", "core.api.clan-role.member", 4);
 
-    private final String name;
+    private final String naming;
     private final String i18n;
     private final int priority;
 
     public static @NotNull ClanRole findByName(@NotNull String name) {
         return Arrays.stream(values())
-                .filter(clanRole -> clanRole.name.equalsIgnoreCase(name))
+                .filter(clanRole -> clanRole.naming.equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(MEMBER);
     }

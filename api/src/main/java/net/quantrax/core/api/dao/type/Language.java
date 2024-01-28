@@ -13,13 +13,13 @@ public enum Language {
     GERMAN("Deutsch", "de", "de"),
     ENGLISH("English", "en", "us");
 
-    private final String name;
+    private final String naming;
     private final String iso;
     private final String country;
 
     public static @NotNull Language findByName(@NotNull String name) {
         return Arrays.stream(values())
-                .filter(language -> language.name.equalsIgnoreCase(name))
+                .filter(language -> language.naming.equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(GERMAN);
     }
