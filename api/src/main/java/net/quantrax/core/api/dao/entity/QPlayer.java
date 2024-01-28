@@ -1,6 +1,6 @@
 package net.quantrax.core.api.dao.entity;
 
-import net.quantrax.core.api.dao.base.entity.UUIDEntity;
+import net.quantrax.core.api.dao.base.Entity;
 import net.quantrax.core.api.dao.type.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -8,8 +8,9 @@ import org.jetbrains.annotations.UnmodifiableView;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.UUID;
 
-public interface QPlayer extends UUIDEntity {
+public interface QPlayer extends Entity<UUID> {
 
     @NotNull Timestamp firstOnline();
 
