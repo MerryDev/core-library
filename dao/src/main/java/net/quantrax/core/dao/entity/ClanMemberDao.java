@@ -51,6 +51,18 @@ public class ClanMemberDao implements ClanMember {
         updateRole(ClanRole.prior(role));
     }
 
+    @Override
+    public void leaveClan() {
+        builder()
+                .query("DELETE FROM clan.clan_member WHERE uuid=?;")
+                .parameter(stmt -> stmt.setUuidAsString(uuid))
+                .delete().send()
+                .exceptionally(throwable -> {
+                    Log.severe("Leaving clan by player with uuid %s failed with an exception: %s", uuid, throwable.getMessage());
+                    return new UpdateResult(0);
+                });
+    }
+
     private void updateRole(@NotNull ClanRole role) {
         builder()
                 .query("UPDATE clan.clan_member SET role=? WHERE uuid=?;")
