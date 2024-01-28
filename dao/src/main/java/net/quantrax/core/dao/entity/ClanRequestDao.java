@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import net.quantrax.core.api.dao.Current;
 import net.quantrax.core.api.dao.entity.ClanMember;
 import net.quantrax.core.api.dao.entity.ClanRequest;
+import net.quantrax.core.api.dao.type.ClanRole;
 import net.quantrax.core.api.util.Log;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +56,20 @@ public class ClanRequestDao implements ClanRequest, Current {
 
     @Override
     public ClanMember accept() {
-        return null;
+        builder()
+                .query("INSERT INTO clan.clan_member (uuid, role, clan_id) VALUE (?, ?, ?);")
+                .parameter(stmt -> stmt.setUuidAsString(requester).setString(ClanRole.MEMBER.name()).setInt(clanId))
+                .insert().send()
+                .exceptionally(throwable -> {
+                    Log.severe("Accepting the request of joining clan with id %s by player with uuid %s failed with an exception: %s", clanId, requester, throwable.getMessage());
+                    return new UpdateResult(0);
+                });
+
+        return builder(ClanMember.class)
+                .query("SELECT * FROM clan.clan_member WHERE uuid=?;")
+                .parameter(stmt -> stmt.setUuidAsString(requester))
+                .readRow(ClanMemberDao::fromRow)
+                .firstSync().orElseThrow(() -> new RuntimeException("The newly created clan member could not be fetched from database"));
     }
 
     @Override
