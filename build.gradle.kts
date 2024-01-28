@@ -17,6 +17,13 @@ repositories {
 
 dependencies {
     api(project(":api"))
+    api(project(":dao"))
+}
+
+tasks {
+    build {
+        dependsOn(shadowJar)
+    }
 }
 
 allprojects {
@@ -50,7 +57,6 @@ allprojects {
                 languageVersion.set(JavaLanguageVersion.of(21))
             }
             withSourcesJar()
-            withJavadocJar()
         }
 
         compileJava {
@@ -63,10 +69,6 @@ allprojects {
 
         javadoc {
             options.encoding = "UTF-8"
-        }
-
-        build {
-            dependsOn(shadowJar)
         }
     }
 }

@@ -1,2 +1,2 @@
 rootProject.name = "core"
-include("api", "dao")
+include("api", "dao", "example")
