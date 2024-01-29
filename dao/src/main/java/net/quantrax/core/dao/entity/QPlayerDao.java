@@ -234,7 +234,8 @@ public class QPlayerDao implements QPlayer {
                 .exceptionally(throwable -> {
                     Log.severe("Deleting all incoming clan invites from player with uuid %s failed with an exception: %s", uuid, throwable.getMessage());
                     return new UpdateResult(0);
-                });
+                })
+                .thenAccept($ -> this.clanInvites = Collections.emptyList());
     }
 
     // Begin internal API
