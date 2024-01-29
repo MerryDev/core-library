@@ -18,11 +18,17 @@ public interface QPlayer extends Entity<UUID> {
 
     @NotNull String name();
 
+    @NotNull Language language();
+
     int coins();
 
     @Nullable Clan clan();
 
     @Nullable Long discordId();
+
+    @NotNull OnlineTime onlineTime();
+
+    @NotNull Settings settings();
 
     @NotNull @UnmodifiableView Collection<Friendship> friendships();
 

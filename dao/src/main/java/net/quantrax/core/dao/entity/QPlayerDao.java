@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,9 @@ public class QPlayerDao implements QPlayer {
     private Long discordId;
     private Language language;
     private int coins;
+
+    private OnlineTime onlineTime;
+    private Settings settings;
 
     private Clan clan;
     private Collection<Friendship> friendships = Collections.emptyList();
@@ -85,6 +89,11 @@ public class QPlayerDao implements QPlayer {
     }
 
     @Override
+    public @NotNull Language language() {
+        return language;
+    }
+
+    @Override
     public int coins() {
         return coins;
     }
@@ -97,6 +106,18 @@ public class QPlayerDao implements QPlayer {
     @Override
     public @Nullable Long discordId() {
         return discordId;
+    }
+
+    @Override
+    public @NotNull OnlineTime onlineTime() {
+        updateOnlineTime();
+        return onlineTime;
+    }
+
+    @Override
+    public @NotNull Settings settings() {
+        updateSettings();
+        return settings;
     }
 
     @Override
@@ -242,6 +263,32 @@ public class QPlayerDao implements QPlayer {
                     return Collections.emptyList();
                 })
                 .thenAccept(invites -> this.clanInvites = Collections.unmodifiableCollection(invites));
+    }
+
+    private void updateOnlineTime() {
+        builder(OnlineTime.class)
+                .query("SELECT * FROM api.online_time WHERE uuid=?;")
+                .parameter(stmt -> stmt.setUuidAsString(uuid))
+                .readRow(OnlineTimeDao::fromRow)
+                .first()
+                .exceptionally(throwable -> {
+                    Log.severe("Fetching the online time of player with uuid %s failed with an exception: %s", uuid, throwable.getMessage());
+                    return Optional.empty();
+                })
+                .thenAccept(optional -> optional.ifPresentOrElse(onlineTime -> this.onlineTime = onlineTime, optional::orElseThrow));
+    }
+
+    private void updateSettings() {
+        builder(Settings.class)
+                .query("SELECT * FROM api.setting WHERE uuid=?;")
+                .parameter(stmt -> stmt.setUuidAsString(uuid))
+                .readRow(SettingsDao::fromRow)
+                .first()
+                .exceptionally(throwable -> {
+                    Log.severe("Fetching the settings of player with uuid %s failed with an exception: %s", uuid, throwable.getMessage());
+                    return Optional.empty();
+                })
+                .thenAccept(optional -> optional.ifPresentOrElse(settings -> this.settings = settings, optional::orElseThrow));
     }
 
     private @NotNull Collection<Friendship> applyFriendships(@NotNull Collection<FriendRequest> friendRequests) {
