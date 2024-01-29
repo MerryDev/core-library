@@ -12,12 +12,12 @@ import java.util.concurrent.CompletableFuture;
 
 public interface PlayerRepository extends Repository<QPlayer> {
 
+    CompletableFuture<List<QPlayer>> findByLanguage(@NotNull Language language);
+
     Optional<QPlayer> findByUUID(@NotNull UUID uuid);
 
     Optional<QPlayer> findByName(@NotNull String name);
 
     Optional<QPlayer> findByDiscordId(@NotNull Long discordId);
-
-    CompletableFuture<List<QPlayer>> findByLanguage(@NotNull Language language);
 
 }
