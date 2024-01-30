@@ -8,10 +8,29 @@ import java.util.Collection;
 
 public interface Clan extends Entity<Integer> {
 
+    @NotNull String name();
+
+    @NotNull String tag();
+
+    int coins();
+
+    int level();
+
+    @NotNull ClanMember owner();
+
     @NotNull @UnmodifiableView Collection<ClanMember> members();
 
-    @NotNull @UnmodifiableView Collection<ClanRequest> requests();
+    void name(@NotNull String name);
 
-    @NotNull @UnmodifiableView Collection<ClanInvite> invites();
+    void tag(@NotNull String tag);
 
+    void level(int level);
+
+    void addCoins(int amount);
+
+    void removeCoins(int amount);
+
+    void coins(int coins);
+
+    void transferOwnership(@NotNull ClanMember oldOwner, @NotNull ClanMember newOwner);
 }
