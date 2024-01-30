@@ -128,6 +128,7 @@ public class QPlayerDao implements QPlayer {
 
     @Override
     public @NotNull @UnmodifiableView Collection<FriendRequest> friendRequests() {
+        updateFriendRequests();
         return Collections.unmodifiableCollection(friendRequests);
     }
 
@@ -251,6 +252,19 @@ public class QPlayerDao implements QPlayer {
                     return Collections.emptyList();
                 })
                 .thenAccept(friendships -> this.friendships = Collections.unmodifiableCollection(friendships));
+    }
+
+    private void updateFriendRequests() {
+        builder(FriendRequest.class)
+                .query("SELECT * FROM friendships.friend_request WHERE requested_uid=?;")
+                .parameter(stmt -> stmt.setUuidAsString(uuid))
+                .readRow(FriendRequestDao::fromRow)
+                .all()
+                .exceptionally(throwable -> {
+                    Log.severe("Fetching all incoming friend requests of player with uuid %s failed with an exception: %s", uuid, throwable.getMessage());
+                    return Collections.emptyList();
+                })
+                .thenAccept(friendRequests -> this.friendRequests = Collections.unmodifiableCollection(friendRequests));
     }
 
     private void updateClanInvites() {
