@@ -15,16 +15,33 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    api(project(":api"))
+    api(project(":dao"))
+}
+
+tasks {
+    build {
+        dependsOn(shadowJar)
+    }
+}
+
 allprojects {
+    apply {
+        apply<JavaPlugin>()
+        apply<JavaLibraryPlugin>()
+        apply<LombokPlugin>()
+    }
+
     repositories {
         mavenCentral()
         mavenLocal()
     }
 
-    apply {
-        apply<JavaPlugin>()
-        apply<JavaLibraryPlugin>()
-        apply<LombokPlugin>()
+    dependencies {
+        api("org.jetbrains:annotations:24.1.0")
+        api("org.apache.commons:commons-lang3:3.14.0")
+        api("com.google.guava:guava:33.0.0-jre")
     }
 
     tasks {
@@ -40,7 +57,6 @@ allprojects {
                 languageVersion.set(JavaLanguageVersion.of(21))
             }
             withSourcesJar()
-            withJavadocJar()
         }
 
         compileJava {
@@ -53,10 +69,6 @@ allprojects {
 
         javadoc {
             options.encoding = "UTF-8"
-        }
-
-        build {
-            dependsOn(shadowJar)
         }
     }
 }
