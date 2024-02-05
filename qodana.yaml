@@ -1,5 +1,7 @@
-version: 1.0
+version: "1.0"
+linter: jetbrains/qodana-jvm-community:2023.3
 profile:
   name: qodana.starter
-
-projectJDK: '21'
+projectJDK: "21"
+include:
+  - name: InstanceofThis
